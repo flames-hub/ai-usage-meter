@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'codex-meter-v4';
+﻿const CACHE_NAME = 'codex-meter-v5';
 const APP_SHELL = [
   './',
   './index.html',
@@ -7,7 +7,8 @@ const APP_SHELL = [
   './manifest.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png',
-  './icons/apple-touch-icon.png'
+  './icons/apple-touch-icon.png',
+  './icons/favicon-32.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -46,4 +47,5 @@ self.addEventListener('fetch', (event) => {
       .then((cached) => cached || fetch(event.request))
   );
 });
+
 
