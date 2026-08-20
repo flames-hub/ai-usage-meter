@@ -1,4 +1,4 @@
-const CACHE_NAME = 'codex-meter-v1';
+﻿const CACHE_NAME = 'codex-meter-v2';
 const APP_SHELL = [
   './',
   './index.html',
@@ -36,3 +36,4 @@ self.addEventListener('fetch', (event) => {
     caches.match(event.request).then((cached) => cached || fetch(event.request))
   );
 });
+

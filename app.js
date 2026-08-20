@@ -1,5 +1,6 @@
-const DATA_URL = 'data/usage.json';
+﻿const DATA_URL = 'data/usage.json';
 const AUTO_REFRESH_MS = 60_000;
+const THEME_STORAGE_KEY = 'codex-meter-theme';
 
 const limitGrid = document.querySelector('#limitGrid');
 const template = document.querySelector('#limitCardTemplate');
@@ -8,14 +9,62 @@ const statusText = document.querySelector('#statusText');
 const updatedAt = document.querySelector('#updatedAt');
 const planBadge = document.querySelector('#planBadge');
 const connectionState = document.querySelector('#connectionState');
+const themeColorMeta = document.querySelector('#themeColor');
+const themeButtons = [...document.querySelectorAll('[data-theme-choice]')];
+const systemThemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
 const EXPECTED_WINDOWS = [
-  { kind: 'fiveHour', label: '5時間枠', duration: 300, kicker: 'SHORT WINDOW' },
-  { kind: 'weekly', label: '週間枠', duration: 10080, kicker: 'WEEKLY WINDOW' },
+  { kind: 'weekly', label: '週間枠', duration: 10080, kicker: 'WEEKLY WINDOW', badge: '7D' },
 ];
+
+const THEME_COLORS = {
+  light: '#f6f7fb',
+  dark: '#090d17',
+  aurora: '#07151c',
+};
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, Number(value) || 0));
+}
+
+function getSavedTheme() {
+  try {
+    const value = localStorage.getItem(THEME_STORAGE_KEY);
+    return ['system', 'light', 'dark', 'aurora'].includes(value) ? value : 'system';
+  } catch {
+    return 'system';
+  }
+}
+
+function resolvedTheme(choice) {
+  if (choice === 'system') return systemThemeQuery.matches ? 'dark' : 'light';
+  return choice;
+}
+
+function applyTheme(choice, { persist = true } = {}) {
+  const validChoice = ['system', 'light', 'dark', 'aurora'].includes(choice) ? choice : 'system';
+
+  if (validChoice === 'system') {
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.dataset.theme = validChoice;
+  }
+
+  for (const button of themeButtons) {
+    const selected = button.dataset.themeChoice === validChoice;
+    button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+  }
+
+  const resolved = resolvedTheme(validChoice);
+  if (themeColorMeta) themeColorMeta.setAttribute('content', THEME_COLORS[resolved] || THEME_COLORS.dark);
+
+  if (persist) {
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, validChoice);
+    } catch {
+      // Local storage is optional; theme still works for this session.
+    }
+  }
 }
 
 function formatResetTime(isoString) {
@@ -58,7 +107,7 @@ function createLimitCard(windowData, expected) {
 
   fragment.querySelector('.limit-kicker').textContent = expected.kicker;
   fragment.querySelector('.limit-title').textContent = expected.label;
-  fragment.querySelector('.window-badge').textContent = expected.duration === 300 ? '5H' : '7D';
+  fragment.querySelector('.window-badge').textContent = expected.badge;
   fragment.querySelector('.remaining-value').textContent = Math.round(remaining);
   fragment.querySelector('.used-value').textContent = `${Math.round(used)}%`;
   fragment.querySelector('.reset-value').textContent = formatResetTime(windowData.resetsAt);
@@ -99,8 +148,8 @@ function render(data) {
     statusText.textContent = 'サンプルデータ — PCで更新スクリプトを実行してください';
   } else {
     statusText.textContent = available
-      ? `${available}件の利用枠を取得しました`
-      : 'Codexから利用枠が返されませんでした';
+      ? '週間利用枠を取得しました'
+      : 'Codexから週間利用枠が返されませんでした';
   }
 
   updatedAt.textContent = formatUpdatedTime(data.updatedAt);
@@ -143,6 +192,18 @@ async function loadUsage() {
   }
 }
 
+for (const button of themeButtons) {
+  button.addEventListener('click', () => applyTheme(button.dataset.themeChoice));
+}
+
+if (typeof systemThemeQuery.addEventListener === 'function') {
+  systemThemeQuery.addEventListener('change', () => {
+    if (getSavedTheme() === 'system') applyTheme('system', { persist: false });
+  });
+}
+
+applyTheme(getSavedTheme(), { persist: false });
+
 refreshButton.addEventListener('click', loadUsage);
 loadUsage();
 setInterval(loadUsage, AUTO_REFRESH_MS);
@@ -152,3 +213,4 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch((error) => console.warn('SW registration failed', error));
   });
 }
+
