@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1020" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#f6f7fb" media="(prefers-color-scheme: light)" />
+  <meta name="description" content="Codexの利用枠をPC・スマホから確認するシンプルなPWA" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>Codex Meter</title>
+</head>
+<body>
+  <main class="page-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">CODEX USAGE</p>
+        <h1>Codex Meter</h1>
+        <p class="subtitle">ChatGPT Codexの利用枠を、PCでもスマホでもひと目で。</p>
+      </div>
+      <button id="refreshButton" class="refresh-button" type="button" aria-label="最新データを再読み込み">
+        <span aria-hidden="true">↻</span>
+        <span>更新</span>
+      </button>
+    </header>
+
+    <section class="summary-panel" aria-labelledby="summary-title">
+      <div class="summary-heading">
+        <div>
+          <p id="summary-title" class="section-label">CURRENT STATUS</p>
+          <p id="statusText" class="status-text">データを読み込んでいます…</p>
+        </div>
+        <div class="meta-list" aria-label="更新情報">
+          <span id="planBadge" class="plan-badge" hidden></span>
+          <span id="updatedAt" class="updated-at">--</span>
+        </div>
+      </div>
+
+      <div id="limitGrid" class="limit-grid" aria-live="polite">
+        <article class="limit-card skeleton" aria-hidden="true"></article>
+        <article class="limit-card skeleton" aria-hidden="true"></article>
+      </div>
+    </section>
+
+    <section class="info-strip" aria-label="補足">
+      <div>
+        <span class="info-label">表示</span>
+        <strong>残り利用枠</strong>
+      </div>
+      <div>
+        <span class="info-label">取得元</span>
+        <strong>Codex App Server</strong>
+      </div>
+      <div>
+        <span class="info-label">自動再読込</span>
+        <strong>60秒</strong>
+      </div>
+    </section>
+
+    <footer>
+      <span>Codex Meter</span>
+      <span id="connectionState">● loading</span>
+    </footer>
+  </main>
+
+  <template id="limitCardTemplate">
+    <article class="limit-card">
+      <div class="card-topline">
+        <div>
+          <p class="limit-kicker"></p>
+          <h2 class="limit-title"></h2>
+        </div>
+        <span class="window-badge"></span>
+      </div>
+
+      <div class="percentage-row">
+        <strong class="remaining-value"></strong>
+        <span class="remaining-unit">% remaining</span>
+      </div>
+
+      <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-fill"></div>
+      </div>
+
+      <div class="card-details">
+        <div>
+          <span>使用済み</span>
+          <strong class="used-value"></strong>
+        </div>
+        <div>
+          <span>リセット</span>
+          <strong class="reset-value"></strong>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
