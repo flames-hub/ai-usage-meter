@@ -5,21 +5,16 @@ const THEME_STORAGE_KEY = 'codex-meter-theme';
 const limitGrid = document.querySelector('#limitGrid');
 const template = document.querySelector('#limitCardTemplate');
 const refreshButton = document.querySelector('#refreshButton');
-const statusText = document.querySelector('#statusText');
 const updatedAt = document.querySelector('#updatedAt');
 const planBadge = document.querySelector('#planBadge');
-const connectionState = document.querySelector('#connectionState');
 const themeColorMeta = document.querySelector('#themeColor');
 const themeButtons = [...document.querySelectorAll('[data-theme-choice]')];
-const systemThemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-const EXPECTED_WINDOWS = [
-  { kind: 'weekly', label: '週間枠', duration: 10080, kicker: 'WEEKLY WINDOW', badge: '7D' },
-];
-
+const WEEKLY_WINDOW = { kind: 'weekly', duration: 10080 };
+const THEMES = ['dark', 'light', 'aurora'];
 const THEME_COLORS = {
-  light: '#f6f7fb',
   dark: '#090d17',
+  light: '#f6f7fb',
   aurora: '#07151c',
 };
 
@@ -30,50 +25,45 @@ function clamp(value, min, max) {
 function getSavedTheme() {
   try {
     const value = localStorage.getItem(THEME_STORAGE_KEY);
-    return ['system', 'light', 'dark', 'aurora'].includes(value) ? value : 'system';
+    return THEMES.includes(value) ? value : 'dark';
   } catch {
-    return 'system';
+    return 'dark';
   }
-}
-
-function resolvedTheme(choice) {
-  if (choice === 'system') return systemThemeQuery.matches ? 'dark' : 'light';
-  return choice;
 }
 
 function applyTheme(choice, { persist = true } = {}) {
-  const validChoice = ['system', 'light', 'dark', 'aurora'].includes(choice) ? choice : 'system';
-
-  if (validChoice === 'system') {
-    document.documentElement.removeAttribute('data-theme');
-  } else {
-    document.documentElement.dataset.theme = validChoice;
-  }
+  const theme = THEMES.includes(choice) ? choice : 'dark';
+  document.documentElement.dataset.theme = theme;
 
   for (const button of themeButtons) {
-    const selected = button.dataset.themeChoice === validChoice;
-    button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+    button.setAttribute(
+      'aria-pressed',
+      button.dataset.themeChoice === theme ? 'true' : 'false'
+    );
   }
 
-  const resolved = resolvedTheme(validChoice);
-  if (themeColorMeta) themeColorMeta.setAttribute('content', THEME_COLORS[resolved] || THEME_COLORS.dark);
+  if (themeColorMeta) {
+    themeColorMeta.setAttribute('content', THEME_COLORS[theme]);
+  }
 
   if (persist) {
     try {
-      localStorage.setItem(THEME_STORAGE_KEY, validChoice);
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
     } catch {
-      // Local storage is optional; theme still works for this session.
+      // Theme remains active for this session.
     }
   }
 }
 
 function formatResetTime(isoString) {
   if (!isoString) return '取得なし';
+
   const date = new Date(isoString);
   if (Number.isNaN(date.getTime())) return '取得なし';
 
   const now = new Date();
   const sameYear = date.getFullYear() === now.getFullYear();
+
   return new Intl.DateTimeFormat('ja-JP', {
     ...(sameYear ? {} : { year: 'numeric' }),
     month: 'numeric',
@@ -85,104 +75,114 @@ function formatResetTime(isoString) {
 
 function formatUpdatedTime(isoString) {
   if (!isoString) return '更新時刻不明';
+
   const date = new Date(isoString);
   if (Number.isNaN(date.getTime())) return '更新時刻不明';
+
   return `更新 ${new Intl.DateTimeFormat('ja-JP', {
-    month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit'
+    month: 'numeric',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   }).format(date)}`;
 }
 
-function findWindow(data, expected) {
+function findWeeklyWindow(data) {
   const windows = Array.isArray(data.windows) ? data.windows : [];
-  return windows.find((item) => item.kind === expected.kind)
-    || windows.find((item) => Number(item.windowDurationMins) === expected.duration)
+
+  return windows.find((item) => item.kind === WEEKLY_WINDOW.kind)
+    || windows.find((item) => Number(item.windowDurationMins) === WEEKLY_WINDOW.duration)
     || null;
 }
 
-function createLimitCard(windowData, expected) {
+function createLimitCard(windowData) {
   const fragment = template.content.cloneNode(true);
   const card = fragment.querySelector('.limit-card');
-  const remaining = clamp(windowData.remainingPercent ?? (100 - windowData.usedPercent), 0, 100);
-  const used = clamp(windowData.usedPercent ?? (100 - remaining), 0, 100);
 
-  fragment.querySelector('.limit-kicker').textContent = expected.kicker;
-  fragment.querySelector('.limit-title').textContent = expected.label;
-  fragment.querySelector('.window-badge').textContent = expected.badge;
+  const remaining = clamp(
+    windowData.remainingPercent ?? (100 - windowData.usedPercent),
+    0,
+    100
+  );
+
+  const used = clamp(
+    windowData.usedPercent ?? (100 - remaining),
+    0,
+    100
+  );
+
   fragment.querySelector('.remaining-value').textContent = Math.round(remaining);
   fragment.querySelector('.used-value').textContent = `${Math.round(used)}%`;
   fragment.querySelector('.reset-value').textContent = formatResetTime(windowData.resetsAt);
 
   const track = fragment.querySelector('.progress-track');
   const fill = fragment.querySelector('.progress-fill');
-  track.setAttribute('aria-valuenow', String(Math.round(remaining)));
-  track.setAttribute('aria-label', `${expected.label} 残り${Math.round(remaining)}%`);
-  requestAnimationFrame(() => { fill.style.width = `${remaining}%`; });
 
-  if (remaining <= 20) card.dataset.level = 'low';
+  track.setAttribute('aria-valuenow', String(Math.round(remaining)));
+  track.setAttribute('aria-label', `週間枠 残り${Math.round(remaining)}%`);
+
+  requestAnimationFrame(() => {
+    fill.style.width = `${remaining}%`;
+  });
+
+  if (remaining <= 20) {
+    card.dataset.level = 'low';
+  }
+
   return fragment;
 }
 
-function createUnavailableCard(expected) {
-  const fragment = template.content.cloneNode(true);
-  fragment.querySelector('.limit-kicker').textContent = expected.kicker;
-  fragment.querySelector('.limit-title').textContent = expected.label;
-  fragment.querySelector('.window-badge').textContent = 'N/A';
-  fragment.querySelector('.remaining-value').textContent = '--';
-  fragment.querySelector('.remaining-unit').textContent = 'not returned';
-  fragment.querySelector('.used-value').textContent = '--';
-  fragment.querySelector('.reset-value').textContent = '取得なし';
-  fragment.querySelector('.progress-track').setAttribute('aria-valuenow', '0');
-  return fragment;
+function renderUnavailable() {
+  limitGrid.innerHTML = `
+    <div class="empty-state">
+      <strong>週間利用枠を取得できませんでした</strong>
+    </div>
+  `;
 }
 
 function render(data) {
   limitGrid.replaceChildren();
 
-  for (const expected of EXPECTED_WINDOWS) {
-    const item = findWindow(data, expected);
-    limitGrid.appendChild(item ? createLimitCard(item, expected) : createUnavailableCard(expected));
-  }
-
-  const available = EXPECTED_WINDOWS.filter((item) => findWindow(data, item)).length;
-  if (data.source === 'sample') {
-    statusText.textContent = 'サンプルデータ — PCで更新スクリプトを実行してください';
+  const weekly = findWeeklyWindow(data);
+  if (weekly) {
+    limitGrid.appendChild(createLimitCard(weekly));
   } else {
-    statusText.textContent = available
-      ? '週間利用枠を取得しました'
-      : 'Codexから週間利用枠が返されませんでした';
+    renderUnavailable();
   }
 
   updatedAt.textContent = formatUpdatedTime(data.updatedAt);
+
   if (data.planType) {
     planBadge.textContent = String(data.planType).toUpperCase();
     planBadge.hidden = false;
   } else {
     planBadge.hidden = true;
   }
-
-  connectionState.textContent = data.source === 'sample' ? '● demo' : '● ready';
 }
 
 function renderError(error) {
   console.error(error);
-  statusText.textContent = 'usage.jsonを読み込めませんでした';
   updatedAt.textContent = '更新失敗';
-  connectionState.textContent = '● error';
   limitGrid.innerHTML = `
     <div class="empty-state">
-      <strong>データがまだありません</strong><br />
-      <span>PCで tools/update-codex-usage.ps1 を実行して usage.json を更新してください。</span>
-    </div>`;
+      <strong>データを読み込めませんでした</strong>
+    </div>
+  `;
 }
 
 async function loadUsage() {
   refreshButton.disabled = true;
   refreshButton.classList.add('is-loading');
-  connectionState.textContent = '● loading';
 
   try {
-    const response = await fetch(`${DATA_URL}?v=${Date.now()}`, { cache: 'no-store' });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const response = await fetch(`${DATA_URL}?v=${Date.now()}`, {
+      cache: 'no-store'
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
     render(await response.json());
   } catch (error) {
     renderError(error);
@@ -193,24 +193,23 @@ async function loadUsage() {
 }
 
 for (const button of themeButtons) {
-  button.addEventListener('click', () => applyTheme(button.dataset.themeChoice));
-}
-
-if (typeof systemThemeQuery.addEventListener === 'function') {
-  systemThemeQuery.addEventListener('change', () => {
-    if (getSavedTheme() === 'system') applyTheme('system', { persist: false });
+  button.addEventListener('click', () => {
+    applyTheme(button.dataset.themeChoice);
   });
 }
 
 applyTheme(getSavedTheme(), { persist: false });
 
 refreshButton.addEventListener('click', loadUsage);
+
 loadUsage();
 setInterval(loadUsage, AUTO_REFRESH_MS);
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch((error) => console.warn('SW registration failed', error));
+    navigator.serviceWorker
+      .register('sw.js')
+      .catch((error) => console.warn('SW registration failed', error));
   });
 }
 
