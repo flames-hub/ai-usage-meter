@@ -10,13 +10,27 @@ const planBadge = document.querySelector('#planBadge');
 const themeColorMeta = document.querySelector('#themeColor');
 const themeButtons = [...document.querySelectorAll('[data-theme-choice]')];
 
-const WEEKLY_WINDOW = { kind: 'weekly', duration: 10080 };
 const THEMES = ['dark', 'light', 'aurora'];
 const THEME_COLORS = {
   dark: '#090d17',
   light: '#f6f7fb',
   aurora: '#07151c',
 };
+
+const CARD_CONFIGS = [
+  {
+    id: 'codex',
+    title: '週間枠',
+    kicker: 'CODEX WEEKLY',
+    badge: '7D',
+  },
+  {
+    id: 'codex_bengalfox',
+    title: 'GPT-5.3-Codex-Spark',
+    kicker: 'SPARK WEEKLY',
+    badge: 'SPARK',
+  },
+];
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, Number(value) || 0));
@@ -49,9 +63,7 @@ function applyTheme(choice, { persist = true } = {}) {
   if (persist) {
     try {
       localStorage.setItem(THEME_STORAGE_KEY, theme);
-    } catch {
-      // Theme remains active for this session.
-    }
+    } catch {}
   }
 }
 
@@ -87,15 +99,38 @@ function formatUpdatedTime(isoString) {
   }).format(date)}`;
 }
 
-function findWeeklyWindow(data) {
-  const windows = Array.isArray(data.windows) ? data.windows : [];
+function getLevel(remaining) {
+  if (remaining >= 50) return 'good';
+  if (remaining >= 20) return 'warn';
+  return 'low';
+}
 
-  return windows.find((item) => item.kind === WEEKLY_WINDOW.kind)
-    || windows.find((item) => Number(item.windowDurationMins) === WEEKLY_WINDOW.duration)
+function findWeeklyWindow(limit) {
+  const windows = Array.isArray(limit?.windows) ? limit.windows : [];
+
+  return windows.find((item) => item.kind === 'weekly')
+    || windows.find((item) => Number(item.windowDurationMins) === 10080)
     || null;
 }
 
-function createLimitCard(windowData) {
+function findLimit(data, id) {
+  if (id === 'codex') {
+    const limits = Array.isArray(data.limits) ? data.limits : [];
+    return limits.find((item) => item.limitId === 'codex')
+      || { limitId: 'codex', limitName: 'Codex', windows: data.windows || [] };
+  }
+
+  const limits = Array.isArray(data.limits) ? data.limits : [];
+
+  return limits.find((item) => item.limitId === id)
+    || limits.find((item) =>
+      id === 'codex_bengalfox'
+      && String(item.limitName || '').toLowerCase().includes('codex-spark')
+    )
+    || null;
+}
+
+function createLimitCard(windowData, config) {
   const fragment = template.content.cloneNode(true);
   const card = fragment.querySelector('.limit-card');
 
@@ -111,6 +146,12 @@ function createLimitCard(windowData) {
     100
   );
 
+  const level = getLevel(remaining);
+  card.dataset.level = level;
+
+  fragment.querySelector('.limit-kicker').textContent = config.kicker;
+  fragment.querySelector('.limit-title').textContent = config.title;
+  fragment.querySelector('.window-badge').textContent = config.badge;
   fragment.querySelector('.remaining-value').textContent = Math.round(remaining);
   fragment.querySelector('.used-value').textContent = `${Math.round(used)}%`;
   fragment.querySelector('.reset-value').textContent = formatResetTime(windowData.resetsAt);
@@ -119,35 +160,43 @@ function createLimitCard(windowData) {
   const fill = fragment.querySelector('.progress-fill');
 
   track.setAttribute('aria-valuenow', String(Math.round(remaining)));
-  track.setAttribute('aria-label', `週間枠 残り${Math.round(remaining)}%`);
+  track.setAttribute('aria-label', `${config.title} 残り${Math.round(remaining)}%`);
 
   requestAnimationFrame(() => {
     fill.style.width = `${remaining}%`;
   });
 
-  if (remaining <= 20) {
-    card.dataset.level = 'low';
-  }
-
   return fragment;
 }
 
-function renderUnavailable() {
-  limitGrid.innerHTML = `
-    <div class="empty-state">
-      <strong>週間利用枠を取得できませんでした</strong>
-    </div>
-  `;
+function createUnavailableCard(config) {
+  const fragment = template.content.cloneNode(true);
+  const card = fragment.querySelector('.limit-card');
+  card.dataset.unavailable = 'true';
+
+  fragment.querySelector('.limit-kicker').textContent = config.kicker;
+  fragment.querySelector('.limit-title').textContent = config.title;
+  fragment.querySelector('.window-badge').textContent = config.badge;
+  fragment.querySelector('.remaining-value').textContent = '--';
+  fragment.querySelector('.remaining-unit').textContent = '%';
+  fragment.querySelector('.used-value').textContent = '--';
+  fragment.querySelector('.reset-value').textContent = '取得なし';
+
+  return fragment;
 }
 
 function render(data) {
   limitGrid.replaceChildren();
 
-  const weekly = findWeeklyWindow(data);
-  if (weekly) {
-    limitGrid.appendChild(createLimitCard(weekly));
-  } else {
-    renderUnavailable();
+  for (const config of CARD_CONFIGS) {
+    const limit = findLimit(data, config.id);
+    const weekly = findWeeklyWindow(limit);
+
+    limitGrid.appendChild(
+      weekly
+        ? createLimitCard(weekly, config)
+        : createUnavailableCard(config)
+    );
   }
 
   updatedAt.textContent = formatUpdatedTime(data.updatedAt);
@@ -201,7 +250,6 @@ for (const button of themeButtons) {
 applyTheme(getSavedTheme(), { persist: false });
 
 refreshButton.addEventListener('click', loadUsage);
-
 loadUsage();
 setInterval(loadUsage, AUTO_REFRESH_MS);
 

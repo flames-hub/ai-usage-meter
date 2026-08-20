@@ -1,4 +1,4 @@
-﻿const CACHE_NAME = 'codex-meter-v3';
+﻿const CACHE_NAME = 'codex-meter-v4';
 const APP_SHELL = [
   './',
   './index.html',

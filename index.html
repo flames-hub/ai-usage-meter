@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta id="themeColor" name="theme-color" content="#090d17" />
-  <meta name="description" content="Codexの週間利用枠を確認するシンプルなPWA" />
+  <meta name="description" content="Codexの利用枠を確認するシンプルなPWA" />
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <link rel="icon" href="icons/icon-192.png" />
@@ -24,13 +24,14 @@
       </button>
     </header>
 
-    <section class="summary-panel" aria-label="Codex週間利用枠">
+    <section class="summary-panel" aria-label="Codex利用枠">
       <div class="meta-row">
         <span id="planBadge" class="plan-badge" hidden></span>
         <span id="updatedAt" class="updated-at">--</span>
       </div>
 
       <div id="limitGrid" class="limit-grid" aria-live="polite">
+        <article class="limit-card skeleton" aria-hidden="true"></article>
         <article class="limit-card skeleton" aria-hidden="true"></article>
       </div>
     </section>
@@ -57,15 +58,15 @@
     <article class="limit-card">
       <div class="card-topline">
         <div>
-          <p class="limit-kicker">WEEKLY WINDOW</p>
-          <h2 class="limit-title">週間枠</h2>
+          <p class="limit-kicker"></p>
+          <h2 class="limit-title"></h2>
         </div>
-        <span class="window-badge">7D</span>
+        <span class="window-badge"></span>
       </div>
 
       <div class="percentage-row">
         <strong class="remaining-value"></strong>
-        <span class="remaining-unit">% remaining</span>
+        <span class="remaining-unit">%</span>
       </div>
 
       <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100">

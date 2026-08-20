@@ -14,10 +14,12 @@ html[data-theme="dark"] {
   --accent: #8090ff;
   --accent-soft: rgba(128, 144, 255, 0.14);
   --track: #252c3c;
-  --progress: #8090ff;
   --shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
   --bg-art:
     radial-gradient(circle at 10% 0%, rgba(91, 108, 255, 0.15), transparent 34rem);
+  --range-good: #70d9a4;
+  --range-warn: #efb15e;
+  --range-low: #ef9aa5;
 }
 
 html[data-theme="light"] {
@@ -31,10 +33,12 @@ html[data-theme="light"] {
   --accent: #5367ff;
   --accent-soft: rgba(83, 103, 255, 0.11);
   --track: #e8eaf2;
-  --progress: #5367ff;
   --shadow: 0 18px 50px rgba(31, 38, 74, 0.08);
   --bg-art:
     radial-gradient(circle at 12% 0%, rgba(83, 103, 255, 0.11), transparent 34rem);
+  --range-good: #27885c;
+  --range-warn: #c9812e;
+  --range-low: #d96f7b;
 }
 
 html[data-theme="aurora"] {
@@ -48,12 +52,14 @@ html[data-theme="aurora"] {
   --accent: #63ead0;
   --accent-soft: rgba(99, 234, 208, 0.12);
   --track: rgba(255, 255, 255, 0.09);
-  --progress: linear-gradient(90deg, #5eead4 0%, #60a5fa 52%, #c084fc 100%);
   --shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
   --bg-art:
     radial-gradient(circle at 7% 0%, rgba(34, 211, 238, 0.22), transparent 34rem),
     radial-gradient(circle at 93% 8%, rgba(168, 85, 247, 0.20), transparent 34rem),
     radial-gradient(circle at 52% 105%, rgba(16, 185, 129, 0.13), transparent 38rem);
+  --range-good: #6ee7b7;
+  --range-warn: #f5bd67;
+  --range-low: #f2a4af;
 }
 
 * {
@@ -177,10 +183,11 @@ h1 {
 .limit-grid {
   display: grid;
   grid-template-columns: 1fr;
+  gap: 12px;
 }
 
 .limit-card {
-  padding: clamp(20px, 4vw, 28px);
+  padding: clamp(18px, 4vw, 26px);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   background: var(--surface-strong);
@@ -197,26 +204,43 @@ h1 {
 
 .limit-title {
   margin: 5px 0 0;
-  font-size: 1.15rem;
+  font-size: 1.12rem;
   letter-spacing: -0.02em;
 }
 
 .percentage-row {
   justify-content: flex-start;
   align-items: baseline;
-  margin: 28px 0 12px;
+  margin: 24px 0 11px;
 }
 
 .remaining-value {
-  font-size: clamp(4rem, 15vw, 6.5rem);
+  font-size: clamp(3.7rem, 14vw, 6.2rem);
   line-height: 0.86;
   letter-spacing: -0.075em;
+  transition: color 160ms ease;
 }
 
 .remaining-unit {
-  color: var(--muted);
-  font-size: 0.76rem;
-  font-weight: 700;
+  font-size: clamp(1.35rem, 5vw, 2.1rem);
+  line-height: 1;
+  font-weight: 800;
+  transition: color 160ms ease;
+}
+
+.limit-card[data-level="good"] .remaining-value,
+.limit-card[data-level="good"] .remaining-unit {
+  color: var(--range-good);
+}
+
+.limit-card[data-level="warn"] .remaining-value,
+.limit-card[data-level="warn"] .remaining-unit {
+  color: var(--range-warn);
+}
+
+.limit-card[data-level="low"] .remaining-value,
+.limit-card[data-level="low"] .remaining-unit {
+  color: var(--range-low);
 }
 
 .progress-track {
@@ -231,14 +255,26 @@ h1 {
   width: 0;
   height: 100%;
   border-radius: inherit;
-  background: var(--progress);
-  transition: width 400ms ease;
+  background: var(--accent);
+  transition: width 400ms ease, background 160ms ease;
+}
+
+.limit-card[data-level="good"] .progress-fill {
+  background: var(--range-good);
+}
+
+.limit-card[data-level="warn"] .progress-fill {
+  background: var(--range-warn);
+}
+
+.limit-card[data-level="low"] .progress-fill {
+  background: var(--range-low);
 }
 
 .card-details {
   align-items: stretch;
-  margin-top: 18px;
-  padding-top: 16px;
+  margin-top: 17px;
+  padding-top: 15px;
   border-top: 1px solid var(--line);
 }
 
@@ -258,8 +294,16 @@ h1 {
 }
 
 .card-details strong {
-  font-size: 0.86rem;
+  font-size: 0.85rem;
   white-space: nowrap;
+}
+
+.limit-card[data-unavailable="true"] {
+  opacity: 0.62;
+}
+
+.limit-card[data-unavailable="true"] .progress-fill {
+  display: none;
 }
 
 .empty-state {
@@ -336,7 +380,7 @@ h1 {
 }
 
 .skeleton {
-  min-height: 250px;
+  min-height: 245px;
   position: relative;
   overflow: hidden;
   background: var(--track);
@@ -371,7 +415,7 @@ h1 {
   }
 
   .percentage-row {
-    margin-top: 24px;
+    margin-top: 22px;
   }
 
   .theme-switcher {
@@ -383,6 +427,14 @@ h1 {
     min-width: 0;
     padding: 0 6px;
     font-size: 0.68rem;
+  }
+
+  .limit-title {
+    font-size: 1rem;
+  }
+
+  .window-badge {
+    font-size: 0.62rem;
   }
 }
 
