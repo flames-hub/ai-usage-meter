@@ -1,7 +1,7 @@
 ﻿{
     "schemaVersion":  2,
     "source":  "codex-app-server",
-    "updatedAt":  "2026-08-21T04:25:02.5235280+00:00",
+    "updatedAt":  "2026-08-21T04:35:02.5715609+00:00",
     "planType":  "pro",
     "limitId":  "codex",
     "windows":  [
@@ -24,14 +24,14 @@
                                            "windowDurationMins":  300,
                                            "usedPercent":  0,
                                            "remainingPercent":  100,
-                                           "resetsAt":  "2026-08-21T09:25:04.0000000+00:00"
+                                           "resetsAt":  "2026-08-21T09:35:04.0000000+00:00"
                                        },
                                        {
                                            "kind":  "weekly",
                                            "windowDurationMins":  10080,
                                            "usedPercent":  0,
                                            "remainingPercent":  100,
-                                           "resetsAt":  "2026-08-28T04:25:04.0000000+00:00"
+                                           "resetsAt":  "2026-08-28T04:35:04.0000000+00:00"
                                        }
                                    ]
                    },
