@@ -1,15 +1,15 @@
 ﻿{
     "schemaVersion":  2,
     "source":  "codex-app-server",
-    "updatedAt":  "2026-08-23T14:35:37.9797114+00:00",
+    "updatedAt":  "2026-08-23T14:45:26.0643251+00:00",
     "planType":  "pro",
     "limitId":  "codex",
     "windows":  [
                     {
                         "kind":  "weekly",
                         "windowDurationMins":  10080,
-                        "usedPercent":  25,
-                        "remainingPercent":  75,
+                        "usedPercent":  28,
+                        "remainingPercent":  72,
                         "resetsAt":  "2026-08-28T03:41:08.0000000+00:00"
                     }
                 ],
@@ -22,8 +22,8 @@
                                        {
                                            "kind":  "weekly",
                                            "windowDurationMins":  10080,
-                                           "usedPercent":  25,
-                                           "remainingPercent":  75,
+                                           "usedPercent":  28,
+                                           "remainingPercent":  72,
                                            "resetsAt":  "2026-08-28T03:41:08.0000000+00:00"
                                        }
                                    ]
@@ -38,14 +38,14 @@
                                            "windowDurationMins":  300,
                                            "usedPercent":  0,
                                            "remainingPercent":  100,
-                                           "resetsAt":  "2026-08-23T19:35:38.0000000+00:00"
+                                           "resetsAt":  "2026-08-23T19:45:24.0000000+00:00"
                                        },
                                        {
                                            "kind":  "weekly",
                                            "windowDurationMins":  10080,
                                            "usedPercent":  0,
                                            "remainingPercent":  100,
-                                           "resetsAt":  "2026-08-30T14:35:38.0000000+00:00"
+                                           "resetsAt":  "2026-08-30T14:45:24.0000000+00:00"
                                        }
                                    ]
                    }
