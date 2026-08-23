@@ -1,33 +1,19 @@
 ﻿{
     "schemaVersion":  2,
     "source":  "codex-app-server",
-    "updatedAt":  "2026-08-23T16:55:03.4894877+00:00",
+    "updatedAt":  "2026-08-23T17:05:17.8144307+00:00",
     "planType":  "pro",
     "limitId":  "codex",
     "windows":  [
                     {
                         "kind":  "weekly",
                         "windowDurationMins":  10080,
-                        "usedPercent":  88,
-                        "remainingPercent":  12,
+                        "usedPercent":  93,
+                        "remainingPercent":  7,
                         "resetsAt":  "2026-08-28T03:41:08.0000000+00:00"
                     }
                 ],
     "limits":  [
-                   {
-                       "limitId":  "codex",
-                       "limitName":  "Codex",
-                       "planType":  "pro",
-                       "windows":  [
-                                       {
-                                           "kind":  "weekly",
-                                           "windowDurationMins":  10080,
-                                           "usedPercent":  88,
-                                           "remainingPercent":  12,
-                                           "resetsAt":  "2026-08-28T03:41:08.0000000+00:00"
-                                       }
-                                   ]
-                   },
                    {
                        "limitId":  "codex_bengalfox",
                        "limitName":  "GPT-5.3-Codex-Spark",
@@ -38,14 +24,28 @@
                                            "windowDurationMins":  300,
                                            "usedPercent":  0,
                                            "remainingPercent":  100,
-                                           "resetsAt":  "2026-08-23T21:55:04.0000000+00:00"
+                                           "resetsAt":  "2026-08-23T22:05:18.0000000+00:00"
                                        },
                                        {
                                            "kind":  "weekly",
                                            "windowDurationMins":  10080,
                                            "usedPercent":  0,
                                            "remainingPercent":  100,
-                                           "resetsAt":  "2026-08-30T16:55:04.0000000+00:00"
+                                           "resetsAt":  "2026-08-30T17:05:18.0000000+00:00"
+                                       }
+                                   ]
+                   },
+                   {
+                       "limitId":  "codex",
+                       "limitName":  "Codex",
+                       "planType":  "pro",
+                       "windows":  [
+                                       {
+                                           "kind":  "weekly",
+                                           "windowDurationMins":  10080,
+                                           "usedPercent":  93,
+                                           "remainingPercent":  7,
+                                           "resetsAt":  "2026-08-28T03:41:08.0000000+00:00"
                                        }
                                    ]
                    }
