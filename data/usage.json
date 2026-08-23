@@ -1,7 +1,7 @@
 ﻿{
     "schemaVersion":  2,
     "source":  "codex-app-server",
-    "updatedAt":  "2026-08-23T06:45:02.9206307+00:00",
+    "updatedAt":  "2026-08-23T06:55:02.8921554+00:00",
     "planType":  "pro",
     "limitId":  "codex",
     "windows":  [
@@ -15,27 +15,6 @@
                 ],
     "limits":  [
                    {
-                       "limitId":  "codex_bengalfox",
-                       "limitName":  "GPT-5.3-Codex-Spark",
-                       "planType":  "pro",
-                       "windows":  [
-                                       {
-                                           "kind":  "fiveHour",
-                                           "windowDurationMins":  300,
-                                           "usedPercent":  0,
-                                           "remainingPercent":  100,
-                                           "resetsAt":  "2026-08-23T11:45:02.0000000+00:00"
-                                       },
-                                       {
-                                           "kind":  "weekly",
-                                           "windowDurationMins":  10080,
-                                           "usedPercent":  0,
-                                           "remainingPercent":  100,
-                                           "resetsAt":  "2026-08-30T06:45:02.0000000+00:00"
-                                       }
-                                   ]
-                   },
-                   {
                        "limitId":  "codex",
                        "limitName":  "Codex",
                        "planType":  "pro",
@@ -46,6 +25,27 @@
                                            "usedPercent":  14,
                                            "remainingPercent":  86,
                                            "resetsAt":  "2026-08-28T03:41:08.0000000+00:00"
+                                       }
+                                   ]
+                   },
+                   {
+                       "limitId":  "codex_bengalfox",
+                       "limitName":  "GPT-5.3-Codex-Spark",
+                       "planType":  "pro",
+                       "windows":  [
+                                       {
+                                           "kind":  "fiveHour",
+                                           "windowDurationMins":  300,
+                                           "usedPercent":  0,
+                                           "remainingPercent":  100,
+                                           "resetsAt":  "2026-08-23T11:55:02.0000000+00:00"
+                                       },
+                                       {
+                                           "kind":  "weekly",
+                                           "windowDurationMins":  10080,
+                                           "usedPercent":  0,
+                                           "remainingPercent":  100,
+                                           "resetsAt":  "2026-08-30T06:55:02.0000000+00:00"
                                        }
                                    ]
                    }
