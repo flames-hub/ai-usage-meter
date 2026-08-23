@@ -1,7 +1,7 @@
 ﻿{
     "schemaVersion":  2,
     "source":  "codex-app-server",
-    "updatedAt":  "2026-08-23T01:25:02.8011113+00:00",
+    "updatedAt":  "2026-08-23T01:35:04.8138633+00:00",
     "planType":  "pro",
     "limitId":  "codex",
     "windows":  [
@@ -10,7 +10,7 @@
                         "windowDurationMins":  10080,
                         "usedPercent":  13,
                         "remainingPercent":  87,
-                        "resetsAt":  "2026-08-28T03:41:08.0000000+00:00"
+                        "resetsAt":  "2026-08-28T03:41:09.0000000+00:00"
                     }
                 ],
     "limits":  [
@@ -24,14 +24,14 @@
                                            "windowDurationMins":  300,
                                            "usedPercent":  0,
                                            "remainingPercent":  100,
-                                           "resetsAt":  "2026-08-23T06:25:04.0000000+00:00"
+                                           "resetsAt":  "2026-08-23T06:35:06.0000000+00:00"
                                        },
                                        {
                                            "kind":  "weekly",
                                            "windowDurationMins":  10080,
                                            "usedPercent":  0,
                                            "remainingPercent":  100,
-                                           "resetsAt":  "2026-08-30T01:25:04.0000000+00:00"
+                                           "resetsAt":  "2026-08-30T01:35:06.0000000+00:00"
                                        }
                                    ]
                    },
@@ -45,7 +45,7 @@
                                            "windowDurationMins":  10080,
                                            "usedPercent":  13,
                                            "remainingPercent":  87,
-                                           "resetsAt":  "2026-08-28T03:41:08.0000000+00:00"
+                                           "resetsAt":  "2026-08-28T03:41:09.0000000+00:00"
                                        }
                                    ]
                    }
